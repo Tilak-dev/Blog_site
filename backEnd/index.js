@@ -3,9 +3,13 @@ import cors from "cors";
 import colors from "colors";
 import morgan from "morgan";
 import dotenv from "dotenv";
+import connectDB from "./config/db.js";
 
 // env config
 dotenv.config(); //is .env is in another folder then use config("./folder name")
+
+// mongodb Connection
+connectDB();
 
 // rest Objects
 const app = expres();
@@ -27,5 +31,8 @@ const PORT = process.env.PORT || 5000;
 
 // listen
 app.listen(PORT, () => {
-   console.log(`server is running in ${process.env.NODE_MODE} on port ${PORT} `.bgBlue.white);
+   console.log(
+      `server is running in ${process.env.NODE_MODE} on port ${PORT} `.bgBlue
+         .white
+   );
 });
