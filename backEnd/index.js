@@ -8,6 +8,9 @@ import connectDB from "./config/db.js";
 // env config
 dotenv.config(); //is .env is in another folder then use config("./folder name")
 
+// router import
+import router from "./routes/userRoute.js";
+
 // mongodb Connection
 connectDB();
 
@@ -20,11 +23,7 @@ app.use(expres.json());
 app.use(morgan("dev"));
 
 // routes
-app.get("/", (req, res) => {
-   res.status(200).send({
-      message: "hn bhai chal gya",
-   });
-});
+app.use("/api/v1/user", router);
 
 // port
 const PORT = process.env.PORT || 5000;
