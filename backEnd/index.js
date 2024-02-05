@@ -10,6 +10,7 @@ dotenv.config(); //is .env is in another folder then use config("./folder name")
 
 // router import
 import router from "./routes/userRoute.js";
+import blogRouter from "./routes/blogRoute.js";
 
 // mongodb Connection
 connectDB();
@@ -24,6 +25,7 @@ app.use(morgan("dev"));
 
 // routes
 app.use("/api/v1/user", router);
+app.use("/api/v1/blog", blogRouter);
 
 // port
 const PORT = process.env.PORT || 5000;
