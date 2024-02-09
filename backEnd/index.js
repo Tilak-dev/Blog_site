@@ -18,7 +18,7 @@ connectDB();
 // rest Objects
 const app = expres();
 
-// middlewares
+// middleware
 app.use(cors());
 app.use(expres.json());
 app.use(morgan("dev"));

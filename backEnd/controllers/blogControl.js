@@ -1,4 +1,6 @@
+import mongoose from "mongoose";
 import blogModel from "../models/blogModel.js";
+import userModel from "../models/userModel.js";
 
 // Get all Blogs
 export const getAllBlogController = async (req, res) => {
@@ -29,26 +31,41 @@ export const getAllBlogController = async (req, res) => {
 // Create blog
 export const createBlogController = async (req, res) => {
    try {
-      const { title, description, image } = req.body;
-      // validations
-      if (!title || !description || !image) {
+      const { title, description, image, user } = req.body;
+      //validation
+      if (!title || !description || !image || !user) {
          return res.status(400).send({
             success: false,
-            message: "Please field require things ",
+            message: "Please Provide ALl Fields",
          });
       }
-      const newBlog = new blogModel({ title, description, image });
-      const savedBlog = await newBlog.save();
-      return res.status(200).send({
+      const exisitingUser = await userModel.findById(user);
+      //validaton
+      if (!exisitingUser) {
+         return res.status(404).send({
+            success: false,
+            message: "unable to find user",
+         });
+      }
+
+      const newBlog = new blogModel({ title, description, image, user });
+      const session = await mongoose.startSession();
+      session.startTransaction();
+      await newBlog.save({ session });
+      exisitingUser.blogs.push(newBlog);
+      await exisitingUser.save({ session });
+      await session.commitTransaction();
+      await newBlog.save();
+      return res.status(201).send({
          success: true,
-         message: "blog created successfiully",
-         savedBlog,
+         message: "Blog Created!",
+         newBlog,
       });
    } catch (error) {
       console.log(error);
-      return res.status(500).send({
+      return res.status(400).send({
          success: false,
-         message: "error in creating blogs ",
+         message: "Error WHile Creating blog",
          error,
       });
    }
@@ -82,7 +99,7 @@ export const updateBlogController = async (req, res) => {
 // get a single blog
 export const getBlogController = async (req, res) => {
    try {
-      const  id  = req.params;
+      const id = req.params;
       const blog = await blogModel.findById(id);
       if (!blog) {
          return res.status(404).send({
@@ -90,6 +107,7 @@ export const getBlogController = async (req, res) => {
             message: "Blog is not Found",
          });
       }
+
       return res.status(200).send({
          success: true,
          message: "fetched single blog ",
@@ -106,28 +124,30 @@ export const getBlogController = async (req, res) => {
 };
 
 // deletre blog
-export const deleteBlog = async (req,res) => {
+export const deleteBlog = async (req, res) => {
    try {
-      const id = req.params
-      const blog = await blogModel.findByIdAndDelete(id)
-      if(!blog){
+      const id = req.params;
+      const blog = await blogModel.findByIdAndDelete(id).populate("user");
+      if (!blog) {
          return res.status(404).send({
-            success:false,
-            message:"blog is not FOUND ",
-         })
+            success: false,
+            message: "blog is not FOUND ",
+         });
       }
+      // If blog exists, continue with deletion process
+      const pullReq = await blog.user.blogs.pull(blog);
+      await pullReq.save();
+
       return res.status(200).send({
-         success:true,
-         message:"Blog successfully deleted from our system",
-      })
-      
+         success: true,
+         message: "Blog successfully deleted from our system",
+      });
    } catch (error) {
-      console.log(error)
+      console.log(error);
       return res.status(500).send({
-         success:false,
-         message:"error in deleting blog",
-         error
-      })
-      
+         success: false,
+         message: "error in deleting blog",
+         error,
+      });
    }
 };
