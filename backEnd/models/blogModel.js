@@ -25,6 +25,6 @@ const blogShema = new mongoose.Schema(
    }
 );
 
-const blogModel = mongoose.model("blogs", blogShema);
+const blogModel = mongoose.model("Blogs", blogShema);
 
 export default blogModel;

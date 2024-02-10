@@ -100,7 +100,7 @@ export const updateBlogController = async (req, res) => {
 export const getBlogController = async (req, res) => {
    try {
       const id = req.params;
-      const blog = await blogModel.findById(id);
+      const blog = await blogModel.findById(id).populate("user");
       if (!blog) {
          return res.status(404).send({
             success: false,
@@ -135,8 +135,8 @@ export const deleteBlog = async (req, res) => {
          });
       }
       // If blog exists, continue with deletion process
-      const pullReq = await blog.user.blogs.pull(blog);
-      await pullReq.save();
+      await blog.user.blogs.pull(blog);
+      await blog.user.save();
 
       return res.status(200).send({
          success: true,
