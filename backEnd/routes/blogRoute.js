@@ -4,6 +4,7 @@ import {
    deleteBlog,
    getAllBlogController,
    getBlogController,
+   getUserBlog,
    updateBlogController,
 } from "../controllers/blogControl.js";
 
@@ -25,5 +26,8 @@ blogRouter.get("/get-blog/:_id", getBlogController);
 
 //DELETE || delete
 blogRouter.delete("/delete-blog/:_id", deleteBlog);
+
+// GET || Getting uder Blog 
+blogRouter.get("/user-blog/:_id",getUserBlog)
 
 export default blogRouter;

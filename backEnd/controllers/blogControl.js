@@ -100,7 +100,7 @@ export const updateBlogController = async (req, res) => {
 export const getBlogController = async (req, res) => {
    try {
       const id = req.params;
-      const blog = await blogModel.findById(id).populate("user");
+      const blog = await blogModel.findById(id);
       if (!blog) {
          return res.status(404).send({
             success: false,
@@ -151,3 +151,34 @@ export const deleteBlog = async (req, res) => {
       });
    }
 };
+
+// Getting User Blog || GET
+
+export const getUserBlog = async(req,res)=>{
+   try {
+      const id = req.params;
+      const userBlog = await userModel.findById(id).populate("blogs");
+      // if user don't exists
+      if (!userBlog){
+         return res.status(404).send({
+            success:false,
+            message:"User Blog Not Found Or Invalid User id"
+         })
+      }
+      // return user blogs 
+      return res.status(200).send({
+         success:true,
+         message:"user Blogs are the below",
+         userBlog,
+      })
+   } catch (error) {
+      console.log(error);
+      return res.status(500).send({
+         success: false,
+         message:" Error in getting user blog",
+         error,
+      })
+      
+   }
+
+}
